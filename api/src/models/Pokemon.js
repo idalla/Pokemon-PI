@@ -60,6 +60,10 @@ module.exports = (sequelize) => {
         min: 0,
         max: 100
       }
+    },
+    img: {
+      type: DataTypes.STRING,
+      defaultValue: 'https://i.postimg.cc/TYsy6Z8c/desconocido.png'
     }
   },
   { timestamps: false }

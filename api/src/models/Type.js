@@ -9,7 +9,15 @@ module.exports = (sequelize) => {
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      defaultValue: 'Normal'
+    },
+    typeImg: {
+      type: DataTypes.STRING
     }
+  },
+  {
+    timestamps: false,
+    createdAt: true,
+    updatedAt: false
   })
 }
