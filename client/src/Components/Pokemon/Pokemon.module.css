@@ -1,0 +1,66 @@
+.card {
+  border: none;
+  border-color: #cad2c5;
+  margin: 20px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  width: 400px;
+  height: 500px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+    rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  background-blend-mode: multiply;
+}
+.card:hover{
+  box-shadow: rgba(0, 0, 0, 0.50) 0px 54px 55px,
+/*     rgba(0, 0, 0, 0.22) 0px -12px 30px, rgba(0, 0, 0, 0.40) 0px 4px 6px, */
+    rgba(0, 0, 0, 0.27) 0px 12px 13px, rgba(0, 0, 0, 0.30) 0px -3px 5px; ;
+}
+
+.name {
+text-decoration: none;
+font-family: Pokemon Solid;
+font-size: xx-large;
+letter-spacing: 10px;
+color: #003566;
+}
+
+.img{
+    display: flex;
+    position: relative;
+    left: 78px;
+    width: 250px;
+     
+}
+.img:hover{
+  transform: scale(1.25);
+  transition: all .5s;
+}
+
+.imgType{
+    display: flex;
+    flex-direction: row;
+    width: 80px;
+    position: relative;
+    left: 60px;
+}
+
+.imgType:hover{
+  transform: scale(1.1);
+  transition: all .5s;
+}
+
+.oneImgType{
+    display: flex;
+    flex-direction: row;
+    width: 80px;
+    position: relative;
+    left: 100px;
+}
+.oneImgType:hover{
+  transform: scale(1.1);
+  transition: all .6s;
+}
+

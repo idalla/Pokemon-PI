@@ -27,53 +27,57 @@ const TypeImage = {
 
 const getFromApi = async () => {
   try {
-    const traeInfo = await axios.get(API_POKEMON)
+    const pokemones = axios.get(API_POKEMON)
       .then(d => d.data)
       .then(data => { return data.results })
-    const filtraUrl = await traeInfo.map(e => e.url)
-    const filtraXInfo = await Promise.all(filtraUrl.map(e => {
-      return axios
-        .get(e)
-        .then(d => d.data)
-        .then(data => { return data })
-    }))
-    const pokemones = await filtraXInfo.map(e => {
-      const official = 'official-artwork'
-      if (e.types.length > 1) {
-        const pokemon = {
-          id: e.id,
-          name: e.name,
-          life: e.stats.find(e => e.stat.name === 'hp').base_stat,
-          attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
-          defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
-          speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
-          height: e.height,
-          weight: e.weight,
-          img: e.sprites.other[official].front_default,
-          firstType: e.types.find(e => parseInt(e.slot) === 1).type.name,
-          secondType: e.types.find(e => parseInt(e.slot) === 2).type.name
+      .then(a => { return a.map(e => e.url) })
+      .then(ab => {
+        return Promise.all(ab.map(e => {
+          return axios
+            .get(e)
+            .then(d => d.data)
+            .then(data => { return data })
+        }))
+      })
+      .then(ac => {
+        return Promise.all(ac.map(e => {
+          const official = 'official-artwork'
+          if (e.types.length === 2) {
+            const pokemon = {
+              id: e.id,
+              name: e.name,
+              life: e.stats.find(e => e.stat.name === 'hp').base_stat,
+              attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
+              defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
+              speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
+              height: e.height,
+              weight: e.weight,
+              img: e.sprites.other[official].front_default,
+              firstType: e.types.find(e => parseInt(e.slot) === 1).type.name,
+              secondType: e.types.find(e => parseInt(e.slot) === 2).type.name
 
-        }
-        pokemon.firstImgType = TypeImage[pokemon.firstType]
-        pokemon.secondImgType = TypeImage[pokemon.secondType]
-        return pokemon
-      } else {
-        const poke = {
-          id: e.id,
-          name: e.name,
-          life: e.stats.find(e => e.stat.name === 'hp').base_stat,
-          attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
-          defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
-          speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
-          height: e.height,
-          weight: e.weight,
-          img: e.sprites.other[official].front_default,
-          firstType: e.types.find(e => parseInt(e.slot) === 1).type.name
-        }
-        poke.firstImgType = TypeImage[poke.firstType]
-        return poke
-      }
-    })
+            }
+            pokemon.firstImgType = TypeImage[pokemon.firstType]
+            pokemon.secondImgType = TypeImage[pokemon.secondType]
+            return pokemon
+          } else {
+            const poke = {
+              id: e.id,
+              name: e.name,
+              life: e.stats.find(e => e.stat.name === 'hp').base_stat,
+              attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
+              defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
+              speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
+              height: e.height,
+              weight: e.weight,
+              img: e.sprites.other[official].front_default,
+              firstType: e.types.find(e => parseInt(e.slot) === 1).type.name
+            }
+            poke.firstImgType = TypeImage[poke.firstType]
+            return poke
+          }
+        }))
+      })
 
     return pokemones
   } catch (error) {
@@ -83,30 +87,138 @@ const getFromApi = async () => {
 
 const getFromDb = async () => {
   try {
-    const poke = await Pokemon.findAll()
+    const poke = await Pokemon.findAll({
+      include: {
+        model: Type,
+        through: {
+          attributes: []
+        },
+        attributes: ['name', 'typeImg']
+      }
+    })
+    /*     console.log('🚀 ~ file: Contralor.js ~ line 103 ~ getFromDb ~ poke', poke) */
     return poke
   } catch (error) {
     console.log('🚀 ~ file: Contralor.js ~ line 53 ~ getFromDb ~ error', error)
   }
 }
 
-const getAllPokemons = async (name) => {
+const getPokemonById = async (id) => {
+  try {
+    if (id.length > 3) {
+      const pokeDb = await Pokemon.findOne({
+        where: {
+          id
+        },
+        include: {
+          model: Type,
+          through: {
+            attributes: []
+          },
+          attributes: ['name', 'typeImg']
+        }
+      })
+      return !pokeDb ? "Sorry, we can't find the Pokemon you're looking for" : pokeDb
+    } else {
+      const idApi = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
+        .then(d => d.data)
+        .then(e => {
+          if (e.types.length === 2) {
+            const pokemon = {
+              id: e.id,
+              name: e.name,
+              life: e.stats.find(e => e.stat.name === 'hp').base_stat,
+              attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
+              defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
+              speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
+              height: e.height,
+              weight: e.weight,
+              img: e.sprites.other['official-artwork'].front_default,
+              firstType: e.types.find(e => parseInt(e.slot) === 1).type.name,
+              secondType: e.types.find(e => parseInt(e.slot) === 2).type.name
+
+            }
+            pokemon.firstImgType = TypeImage[pokemon.firstType]
+            pokemon.secondImgType = TypeImage[pokemon.secondType]
+            return pokemon
+          } else {
+            const poke = {
+              id: e.id,
+              name: e.name,
+              life: e.stats.find(e => e.stat.name === 'hp').base_stat,
+              attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
+              defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
+              speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
+              height: e.height,
+              weight: e.weight,
+              img: e.sprites.other['official-artwork'].front_default,
+              firstType: e.types.find(e => parseInt(e.slot) === 1).type.name
+            }
+            poke.firstImgType = TypeImage[poke.firstType]
+            return poke
+          }
+        })
+      return idApi || "Sorry, we can't find the Pokemon you're looking for"
+    }
+  } catch (error) {
+
+  }
+}
+
+const getAllPokemons = async () => {
   try {
     const FromDb = await getFromDb()
     const FromApi = await getFromApi()
-    if (name) {
-      const pokeName = name.toLowerCase()
-      const nameDb = FromDb.find(e => e.name.toLowerCase() === pokeName)
-      const nameApi = FromApi.find(e => e.name.toLowerCase() === pokeName)
-      if (nameDb) return nameDb
-      else if (nameApi) { return nameApi } else return "Sorry, we can't find the Pokemon you're looking for"
-    } else if (!name) {
-      return FromApi.concat(FromDb)
-    } else {
-      return "Sorry we're out of service"
-    }
+    return [...FromDb, ...FromApi]
   } catch (error) {
     console.log('🚀 ~ file: functions.js ~ line 58 ~ getAllPokemons ~ error', error)
+  }
+}
+
+const getByName = async (name) => {
+  try {
+    const apiName = await axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
+      .then(d => d.data)
+      .then(e => {
+        if (e.types.length === 2) {
+          const pokemon = {
+            id: e.id,
+            name: e.name,
+            life: e.stats.find(e => e.stat.name === 'hp').base_stat,
+            attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
+            defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
+            speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
+            height: e.height,
+            weight: e.weight,
+            img: e.sprites.other['official-artwork'].front_default,
+            firstType: e.types.find(e => parseInt(e.slot) === 1).type.name,
+            secondType: e.types.find(e => parseInt(e.slot) === 2).type.name
+
+          }
+          pokemon.firstImgType = TypeImage[pokemon.firstType]
+          pokemon.secondImgType = TypeImage[pokemon.secondType]
+          return pokemon
+        } else {
+          const poke = {
+            id: e.id,
+            name: e.name,
+            life: e.stats.find(e => e.stat.name === 'hp').base_stat,
+            attack: e.stats.find(e => e.stat.name === 'attack').base_stat,
+            defense: e.stats.find(e => e.stat.name === 'defense').base_stat,
+            speed: e.stats.find(e => e.stat.name === 'speed').base_stat,
+            height: e.height,
+            weight: e.weight,
+            img: e.sprites.other['official-artwork'].front_default,
+            firstType: e.types.find(e => parseInt(e.slot) === 1).type.name
+          }
+          poke.firstImgType = TypeImage[poke.firstType]
+          return poke
+        }
+      })
+    const dbName = await getFromDb()
+    return typeof apiName === 'object' ? apiName : dbName.find(e => e.name)
+  } catch (error) {
+    return "Sorry, we can't find your pokemon's name"
   }
 }
 
@@ -115,38 +227,58 @@ const getTypes = async () => {
     const traeInfo = await axios.get(API_TYPE)
       .then(d => d.data)
       .then(data => { return data.results })
+      .then(res => {
+        return res.map(e => e.name)
+      })
+      .then(re => {
+        return Promise.all(re.map(async e => {
+          if (e === 'shadow' || e === 'unknown') {
+            await Type.create({ name: e })
+          } else {
+            const pokeType = await Type.create({ name: e, typeImg: TypeImage[e] })
+            return pokeType
+          }
+        }))
+      })
 
-    const filtraType = await traeInfo.map(e => e.name)
-
-    const trae = await Promise.all(filtraType.map(async e => {
-      if (e === 'shadow' || e === 'unknown') {
-        await Type.create({ name: e })
-      } else {
-        const pokeType = await Type.create({ name: e, typeImg: TypeImage[e] })
-        return pokeType
-      }
-    }))
-    return trae
+    return traeInfo
   } catch (error) {
     console.log('🚀 ~ file: Contralor.js ~ line 74 ~ getTypes ~ error', error)
   }
 }
 
-const postPokemon = async (name, life, attack, defense, speed, height, weight, type, img) => {
+const postPokemon = async (name, life, attack, defense, speed, height, weight, types, img) => {
   try {
+    if (!img || img === '') img = 'https://i.postimg.cc/ZRkj64zr/desconocido.png'
     if (name && life && attack && defense && speed && height && weight) {
-      const pokes = await getAllPokemons(name)
+      const pokes = await getByName(name)
+      const novis = {
+        name,
+        life: parseInt(life),
+        attack: parseInt(attack),
+        defense: parseInt(defense),
+        speed: parseInt(speed),
+        height: parseInt(height),
+        weight: parseInt(weight),
+        img
+      }
 
       if (typeof pokes === 'string') {
-        if (type) {
-          const code = await Type.findOne({ where: { name: type } })
-          const newPokemon = await Pokemon.create({ name, life, attack, defense, speed, height, weight, img })
-          await newPokemon.setTypes(code)
+        if (types) {
+          const newPokemon = await Pokemon.create(novis)
+          types.map(async e => {
+            const code = await Type.findOne({ where: { name: e } })
+            return newPokemon.addType(code, {
+              through: 'PokemonType'
+            })
+          })
           const newPoke = await Pokemon.findOne({ where: { name } })
           return newPoke
         } else {
-          const newPoke = await Pokemon.create({ name, life, attack, defense, speed, height, weight, img })
-          await newPoke.setTypes(1)
+          const newPoke = await Pokemon.create(novis)
+          await newPoke.addType('normal', {
+            through: 'PokemonType'
+          })
           return newPoke
         }
       } else {
@@ -165,6 +297,7 @@ module.exports = {
   getAllPokemons,
   getFromDb,
   getTypes,
-  postPokemon
-
+  postPokemon,
+  getByName,
+  getPokemonById
 }

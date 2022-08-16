@@ -1,8 +1,13 @@
 import React from 'react'
- import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { getDetail } from '../../Redux/Actions/Actions'
 import s from './Pokemon.module.css' 
 
-export default class Card extends React.Component {
+
+class Pokemon extends React.Component {
+
+
   render () {
      const backgrounColour = {
        bug: '#99d98c',
@@ -24,25 +29,76 @@ export default class Card extends React.Component {
   steel: '#b8d0eb',
   water: '#2ec4b6' 
     }
+    const name = this.props.name
+    let firt= name.split('')
+    let first = firt.shift()
+    let upper = first.toUpperCase()
+    firt.unshift(upper)
+    let names = firt.concat("")
+if (this.props.firstType !== undefined) {
     return   (<div
         className={s.card}
         style={{
           backgroundColor: backgrounColour[this.props.firstType]
         }}
         >
-          <img src={this.props.img} alt="" />
-        <img src={this.props.firstImgType} alt="" />
-        {this.props.secondImgType && 
-        (<img src={this.props.secondImgType} alt="" />) 
+          <Link  onClick={async() => await this.props.getDetails(this.props.id)} style={{textDecoration: 'none'}} strict to={`/home/id/${this.props.id}`}>
+            <h2 className={s.name}>{names}</h2>
+           
+          <img className={s.img} src={this.props.img} alt="" />
+            
+          </Link>
+       <div className={s.imgType} >
+        {this.props.secondImgType ? 
+        (<>
+        <img className={s.imgType} src={this.props.firstImgType} alt="" />
+        <img className={s.imgType} src={this.props.secondImgType} alt="" />
+        </>) : 
+        ( <img className={s.oneImgType} src={this.props.firstImgType} alt="" />)
         }
+        </div>
         <div
           className={s.cardbody}
+          >
+          
+        </div>
+      </div> )}
+      else {
+          return   (<div
+        className={s.card}
+        style={{
+          backgroundColor: backgrounColour[this.props.firstType]
+        }}
         >
-          <Link to={`/home/${this.props.id}`}>
-            <h4>{this.props.name}</h4>
+          <Link  onClick={async() => await this.props.getDetails(this.props.id)} style={{textDecoration: 'none'}}  to={`/home/id/${this.props.id}`}>
+            <h2 className={s.name}>{names}</h2>
+           
+          <img className={s.img} src={this.props.img} alt="" />
+            
           </Link>
+       <div className={s.imgType} >
+        {this.props.Types[1] ? 
+        (<>
+        <img className={s.imgType} src={this.props.Types[0]?.imgType} alt="" />
+        <img className={s.imgType} src={this.props.Types[1]?.imgType} alt="" />
+        </>) : 
+        ( <img className={s.oneImgType} src={this.props.firstImgType} alt="" />)
+        }
+        </div>
+        <div
+          className={s.cardbody}
+          >
           
         </div>
       </div> )
+
+      }
   }
 }
+const mapDispatchToProps = (dispatch) => {
+  return {
+   getDetails: async (id) => await dispatch(getDetail(id)),
+  }
+}
+
+export default connect(null, mapDispatchToProps)(Pokemon)

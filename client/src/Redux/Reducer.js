@@ -1,53 +1,85 @@
-import { FILTER_AS, FILTER_AT, FILTER_AZ, FILTER_DES, FILTER_ZA, GET_ALL, GET_BY_ID, ISLOADING } from './Actions/type.js'
+import { CLEAR_DETAIL, CLEAR_FILTER, FILTER_AS, FILTER_AT, FILTER_AZ, FILTER_DES, FILTER_ZA, FILT_NAME, GET_ALL, GET_BY_ID, GET_DETAIL, GET_TYPE} from './Actions/type.js'
+
+
 
 const initialState = {
   Pokemons: [],
+  PokemonFilter: [],
   PokemonDetail: {},
-  Loadiang: false
+  Types: [],
 }
-console.log("🚀 ~ file: Reducer.js ~ line 7 ~ initialState", initialState)
+
 
 export default function reducer (state = initialState, action) {
   switch (action.type) {
     case GET_ALL:
       return {
         ...state,
-        Pokemons: action.payload  
+        Pokemons: action.payload,
+        PokemonFilter: action.payload  
       }
     case GET_BY_ID:
       return {
         ...state,
-        PokemonDetail: action.payload
+        Pokemons: state.Pokemons.filter(e => e.id === action.payload.id)
       }
+    case GET_DETAIL:
+      return {
+        ...state,
+        PokemonDetail: action.payload
+        }
     case FILTER_AZ:
       return {
         ...state,
-        Pokemons: state.Pokemons.sort((a, b) => a.name - b.name)
+        PokemonFilter: state.PokemonFilter.sort((a, b) => a.name - b.name)
       }
     case FILTER_ZA:
       return {
         ...state,
-        Pokemons: state.Pokemons.sort((a, b) => b.name - a.name)
+        PokemonFilter: state.PokemonFilter.sort((a, b) => b.name - a.name)
       }
     case FILTER_AS:
       return {
         ...state,
-        Pokemons: state.Pokemons.sort((a, b) => a.id - b.id)
+        PokemonFilter: state.PokemonFilter.sort((a, b) => a.id - b.id)
       }
     case FILTER_DES:
       return {
         ...state,
-        Pokemons: state.Pokemons.sort((a, b) => b.id - a.id)
+        PokemonFilter: state.PokemonFilter.sort((a, b) => b.id - a.id)
       }
     case FILTER_AT:
       return {
         ...state,
-        Pokemons: state.Pokemons.sort((a, b) => a.attack - b.attack)
+        PokemonFilter: state.PokemonFilter.sort((a, b) => a.attack - b.attack)
       }
-    case ISLOADING:
+      case CLEAR_DETAIL:
       return {
         ...state,
-        Loadiang: !(state.Loadiang)
+        PokemonDetail: action.payload
+      }
+      case CLEAR_FILTER:
+      return {
+        ...state,
+        PokemonFilter: state.Pokemons 
+      }
+      case FILT_NAME:
+        /* const PokeSearch = state.Pokemons.filter(e => {
+          return e.name.includes(action.payload)
+        }) */
+        const PokeSearch = action.payload
+        
+         return typeof PokeSearch === 'object'  ? {
+          ...state,
+          PokemonFilter: [PokeSearch] 
+        } : {
+          ...state, 
+          PokemonFilter: []} 
+
+      case GET_TYPE: 
+      return{
+        ...state,
+        Types: action.payload
       }
 
     default:

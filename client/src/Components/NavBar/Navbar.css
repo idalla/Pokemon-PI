@@ -1,0 +1,79 @@
+.general {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    height: 120px;
+    background-color: #122d57;
+    margin-bottom: 100px;
+ 
+}
+
+
+.pintado {
+    background-color: #397ed7;
+    width: 1475px;
+    padding:10px ; 
+    position: relative;
+    top:10px;
+/*     border-radius: 0px 0px 100px 100px; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+
+.lupa {
+  /* float: right; */
+  width: 30px;
+  justify-items: center;
+  background-color: transparent;
+  border: none;
+  margin: -0.5rem;
+  padding: 0.5rem;
+  margin-right: 20px;
+  cursor: pointer;
+}
+.lupa:focus {
+  outline-color: transparent;
+  outline-style: solid;
+}
+/* .lupa::after {
+} */
+.search {
+  display: flex;
+  flex-direction: row;
+  overflow: clip;
+  transition: 2s;
+  border: 0px;
+}
+
+
+.boton {
+  align-items: center;
+  border-radius: 25px;
+  opacity: 1;
+  font-size: x-large;
+  font-family: 'roboto';
+  
+  font-weight: bolder;
+  text-decoration: none;
+  background-color: blueviolet;
+  border: none;
+  padding: 10px;
+  width: 200px;
+  transition: 0.5s;
+  color: white;
+  text-align: center;
+}
+.boton:hover {
+  background-color: rgb(93, 24, 158);
+  color: white;
+  cursor: pointer;
+}
+
+.goTo {
+  text-decoration: none;
+  color: white;
+  text-align: center;
+}

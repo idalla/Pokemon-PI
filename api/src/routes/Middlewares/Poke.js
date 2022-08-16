@@ -1,7 +1,6 @@
 const { Router } = require('express')
-const { getFromDb, getFromApi, postPokemon } = require('../Contralor')
-const { getAllPokemons } = require('../Contralor')
-/* const { Pokemon, Type } = require('../../db') */
+const { postPokemon, getByName, getAllPokemons, getPokemonById } = require('../Contralor')
+// const { Pokemon, Type } = require('../../db')
 
 const Poke = Router()
 
@@ -9,8 +8,7 @@ Poke.get('/', async (req, res) => {
   try {
     const { name } = req.query
     if (name) {
-      const poke = await getAllPokemons(name)
-      typeof poke === 'string' ? res.status(404).send(poke) : res.status(200).json(poke)
+      res.status(200).json(await getByName(name))
     } else if (!name) {
       res.status(200).json(await getAllPokemons())
     }
@@ -23,26 +21,19 @@ Poke.get('/', async (req, res) => {
 Poke.get('/:idPokemon', async (req, res) => {
   try {
     const { idPokemon } = req.params
-    if (idPokemon.length > 3) {
-      const pokes = await getFromDb()
-      console.log('🚀 ~ file: Poke.js ~ line 30 ~ Poke.get ~ pokes', pokes)
-      const pokeDb = pokes.findByPk(parseInt(idPokemon))
-      pokeDb ? res.status(200).json(pokeDb) : res.status(400).send("Sorry, we can't find the Pokemon you're looking for")
-    } else {
-      const pokesApi = await getFromApi()
-      const pokeApi = pokesApi.find(e => parseInt(e.id) === parseInt(idPokemon))
-      pokeApi ? res.status(200).json(pokeApi) : res.status(400).send("Sorry, we can't find the Pokemon you're looking for")
-    }
+    const allId = await getPokemonById(idPokemon)
+    typeof allId === 'string' ? res.status(400).send(allId) : res.status(200).json(allId)
   } catch (error) {
     console.log('🚀 ~ file: Poke.js ~ line 37 ~ Poke.get ~ error', error)
   }
 })
 
 Poke.post('/', async (req, res) => {
-  const { name, life, attack, defense, speed, height, weight, type, img } = req.body
+  const { name, life, attack, defense, speed, height, weight, types, img } = req.body
+  console.log('🚀 ~ file: Poke.js ~ line 33 ~ Poke.post ~ types', types)
   try {
-    const poke = await postPokemon(name, life, attack, defense, speed, height, weight, type, img)
-    typeof poke === 'string' ? res.status(400).send(poke) : res.status(200).json(poke)
+    const poke = await postPokemon(name, life, attack, defense, speed, height, weight, types, img)
+    return (typeof poke === 'string') ? res.status(400).send(poke) : res.status(200).json(poke)
   } catch (error) {
     console.log('🚀 ~ file: Poke.js ~ line 89 ~ Poke.post ~ error', error)
     res.status(404).send("Sorry we can't uploud your Pokemon")

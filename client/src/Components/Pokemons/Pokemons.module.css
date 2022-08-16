@@ -1,0 +1,30 @@
+.general{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center
+    
+
+}
+.pokemons {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+}
+/* .Pokemons {
+} */
+
+.Pagina {
+display: flex;
+flex-direction: row;
+margin-left: 20px;
+font-family: 'Roboto';
+font-weight: bolder;
+border: 5px;
+padding-top: 10px;
+padding-bottom: 10px;
+border: 5px;
+border-color: black;
+cursor: pointer;
+}

@@ -1,0 +1,11 @@
+.input{
+    padding: 5px;
+    border-radius: 25px;
+    width: 150px;
+    border: 0px;
+}
+
+.input:focus{
+  outline-color: transparent;
+  outline-style: solid;
+}
